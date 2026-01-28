@@ -1,3 +1,1 @@
-# md is mark down
-
-#learn about git and githb
+hiiii everyone this is my repo
