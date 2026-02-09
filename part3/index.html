@@ -1,0 +1,1028 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taj Mahal Explorer • Learn in 3D</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .display-font {
+            font-family: 'Playfair Display', sans-serif;
+        }
+
+        .scene {
+            perspective: 1400px;
+            perspective-origin: 50% 30%;
+        }
+
+        .taj-model {
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+            position: relative;
+            width: 420px;
+            height: 380px;
+            margin: 0 auto;
+        }
+
+        .taj-base {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) rotateX(70deg);
+            width: 320px;
+            height: 140px;
+            background: linear-gradient(135deg, #f5f5f5, #e5e5e5);
+            border-radius: 12px;
+            box-shadow: 0 40px 60px -20px rgba(0,0,0,0.4),
+                        inset 0 20px 30px rgba(255,255,255,0.6);
+            border: 1px solid #d1d1d1;
+        }
+
+        .taj-base::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 8px,
+                rgba(0,0,0,0.03) 8px,
+                rgba(0,0,0,0.03) 16px
+            );
+            border-radius: 12px;
+        }
+
+        .minaret {
+            position: absolute;
+            width: 28px;
+            height: 220px;
+            background: linear-gradient(#f8f8f8, #e8e8e8);
+            border-radius: 9999px 9999px 0 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3),
+                        inset 0 0 20px rgba(255,255,255,0.7);
+            transform-origin: bottom center;
+        }
+
+        .minaret::before {
+            content: '';
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 42px;
+            height: 42px;
+            background: #f1f1f1;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25),
+                        inset 0 12px 15px rgba(255,220,100,0.4);
+        }
+
+        .minaret::after {
+            content: '';
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 18px;
+            background: #d4af37;
+            border-radius: 50%;
+            box-shadow: inset 0 3px 6px rgba(255,255,255,0.9);
+        }
+
+        .main-building {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            width: 210px;
+            height: 140px;
+            background: #f9f9f9;
+            transform: translate(-50%, 0) rotateX(12deg);
+            border-radius: 6px;
+            box-shadow: 25px 35px 45px -15px rgba(0,0,0,0.35),
+                        inset 0 25px 35px rgba(255,255,255,0.65);
+            border: 3px solid #e0e0e0;
+        }
+
+        .main-building .arch {
+            position: absolute;
+            background: #f0f0f0;
+            box-shadow: inset 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        .arch-left {
+            left: 22px;
+            top: 38px;
+            width: 42px;
+            height: 68px;
+            border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        }
+
+        .arch-center {
+            left: 50%;
+            top: 22px;
+            width: 68px;
+            height: 84px;
+            border-radius: 50% 50% 50% 50% / 20% 20% 80% 80%;
+            transform: translateX(-50%);
+        }
+
+        .arch-right {
+            right: 22px;
+            top: 38px;
+            width: 42px;
+            height: 68px;
+            border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%;
+        }
+
+        .taj-dome {
+            position: absolute;
+            bottom: 138px;
+            left: 50%;
+            width: 132px;
+            height: 132px;
+            background: radial-gradient(circle at 40% 30%, #fefefe, #f0f0f0 40%, #e2e2e2);
+            border-radius: 50% 50% 50% 40%;
+            transform: translateX(-50%) rotateX(8deg);
+            box-shadow: 0 22px 42px -12px rgba(0,0,0,0.45),
+                        inset 22px 18px 38px rgba(255,255,255,0.85),
+                        inset -18px -22px 30px rgba(180,180,180,0.2);
+            z-index: 20;
+        }
+
+        .taj-dome::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            width: 38px;
+            height: 38px;
+            background: #c9a23e;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3),
+                        inset 0 6px 8px #fff;
+        }
+
+        .taj-dome::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            width: 92px;
+            height: 18px;
+            background: #d1d1d1;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            opacity: 0.6;
+        }
+
+        .small-dome {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            background: radial-gradient(circle at 45% 35%, #f8f8f8, #e8e8e8);
+            border-radius: 50%;
+            box-shadow: 0 12px 22px rgba(0,0,0,0.2),
+                        inset 0 10px 14px rgba(255,255,255,0.7);
+        }
+
+        .small-dome.left {
+            bottom: 136px;
+            left: 76px;
+        }
+
+        .small-dome.right {
+            bottom: 136px;
+            right: 76px;
+        }
+
+        .small-dome::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            width: 14px;
+            height: 14px;
+            background: #d4af37;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .pinnacle {
+            position: absolute;
+            width: 6px;
+            height: 28px;
+            background: #d4af37;
+            left: 50%;
+            top: -14px;
+            transform: translateX(-50%);
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .highlight {
+            animation: highlight-pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes highlight-pulse {
+            0%, 100% { filter: brightness(1.15); }
+            50% { filter: brightness(0.95); }
+        }
+
+        .info-float {
+            position: absolute;
+            background: white;
+            padding: 14px 18px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px -6px rgba(0,0,0,0.3),
+                        0 2px 6px rgba(0,0,0,0.1);
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.2s cubic-bezier(0.23,1,0.32,1);
+            transform: translateY(8px);
+            z-index: 50;
+            font-size: 13px;
+            line-height: 1.35;
+            max-width: 168px;
+        }
+
+        .info-float.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .info-float::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 24px;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid white;
+        }
+
+        .water {
+            position: absolute;
+            bottom: -42px;
+            left: 50%;
+            transform: translate(-50%, 0) rotateX(72deg);
+            width: 260px;
+            height: 110px;
+            background: linear-gradient(transparent, #a1c4fd 30%, #c2e9fb);
+            opacity: 0.75;
+            border-radius: 50%;
+            filter: blur(1px);
+        }
+
+        .water::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(255,255,255,0.6) 10%, transparent 60%);
+            animation: water-shimmer 8s linear infinite;
+        }
+
+        @keyframes water-shimmer {
+            0% { transform: translate(-50%, 0) rotateX(72deg) translateX(-18px); }
+            50% { transform: translate(-50%, 0) rotateX(72deg) translateX(12px); }
+            100% { transform: translate(-50%, 0) rotateX(72deg) translateX(-18px); }
+        }
+
+        .moon {
+            position: absolute;
+            top: 62px;
+            right: 82px;
+            width: 54px;
+            height: 54px;
+            background: radial-gradient(circle at 30% 30%, #fffef0, #f0e6c8 40%, #e6d5a8);
+            border-radius: 50%;
+            box-shadow: 0 0 42px 22px rgba(255, 242, 210, 0.7),
+                        0 0 82px 38px rgba(255, 232, 170, 0.4);
+            z-index: 10;
+        }
+
+        .moon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            top: 14px;
+            left: 18px;
+        }
+
+        .moon::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.35);
+            border-radius: 50%;
+            top: 26px;
+            left: 32px;
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 32px;
+            width: 22px;
+        }
+
+        .tree.left { left: 48px; }
+        .tree.right { right: 48px; }
+
+        .tree-trunk {
+            width: 6px;
+            height: 48px;
+            background: #5c4033;
+            margin: 0 auto;
+            border-radius: 3px;
+        }
+
+        .tree-leaves {
+            width: 34px;
+            height: 34px;
+            background: #3a7043;
+            border-radius: 50%;
+            margin: -14px auto 0;
+            box-shadow: 0 8px 14px rgba(0,0,0,0.2);
+        }
+
+        .tree-leaves::before {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: #4a8a54;
+            border-radius: 50%;
+            top: -12px;
+            left: 6px;
+        }
+
+        .tourist-dot {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background: #ff5a5f;
+            border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(255,90,95,0.3);
+            animation: walk 4.2s linear infinite;
+        }
+
+        @keyframes walk {
+            0% { transform: translateX(-110px) rotateX(70deg); }
+            100% { transform: translateX(110px) rotateX(70deg); }
+        }
+
+        .day-mode .taj-base {
+            background: linear-gradient(135deg, #f8f7f2, #ebe9df);
+        }
+
+        .day-mode .taj-dome {
+            background: radial-gradient(circle at 40% 30%, #fffefc, #f5f4ee 40%, #e9e7df);
+            box-shadow: 0 22px 42px -12px rgba(0,0,0,0.2),
+                        inset 22px 18px 38px rgba(255,255,255,0.95);
+        }
+
+        .day-mode .minaret {
+            background: linear-gradient(#fcfcfc, #f4f4f4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .day-mode .main-building {
+            background: #fcfcfc;
+            box-shadow: 25px 35px 45px -15px rgba(0,0,0,0.15);
+        }
+
+        .day-mode .moon {
+            display: none;
+        }
+
+        .day-mode .water {
+            background: linear-gradient(transparent, #bae6fd 30%, #bae6fd);
+            opacity: 0.6;
+        }
+
+        .tour-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tour-btn:hover {
+            transform: scale(1.03) translateY(-1px);
+            box-shadow: 0 6px 18px -4px rgba(212, 175, 55, 0.4);
+        }
+
+        .fact-bubble {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .fact-bubble:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 28px -6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <div class="max-w-7xl mx-auto">
+        <!-- header -->
+        <div class="flex items-center justify-between px-8 py-6 border-b border-zinc-800">
+            <div class="flex items-center gap-x-3">
+                <div class="w-9 h-9 bg-amber-400 rounded flex items-center justify-center">
+                    <span class="text-zinc-950 text-2xl">🕌</span>
+                </div>
+                <div>
+                    <div class="display-font text-2xl tracking-tight font-bold text-white">TAJ MAHAL</div>
+                    <div class="text-[10px] text-zinc-500 -mt-1.5 pl-0.5">3D EDUCATIONAL EXPLORER</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-x-10 text-sm uppercase tracking-widest font-medium text-zinc-400">
+                <div class="cursor-pointer hover:text-amber-300 transition-colors">EXPLORE</div>
+                <div class="cursor-pointer hover:text-amber-300 transition-colors">HISTORY</div>
+                <div class="cursor-pointer hover:text-amber-300 transition-colors">ARCHITECTURE</div>
+                <div class="cursor-pointer hover:text-amber-300 transition-colors">FACTS</div>
+                <div class="cursor-pointer hover:text-amber-300 transition-colors">VISIT</div>
+            </div>
+
+            <div class="flex items-center gap-x-4">
+                <div onclick="toggleDayMode()" id="mode-toggle"
+                     class="bg-zinc-900 hover:bg-zinc-800 transition-colors px-3 py-1.5 rounded-full flex items-center gap-x-2 cursor-pointer">
+                    <div class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-medium text-zinc-400">NIGHT MODE</span>
+                </div>
+                <div class="bg-zinc-900 text-zinc-400 px-3 py-1 rounded text-xs flex items-center gap-x-1.5">
+                    <div>EN</div>
+                    <div class="text-[10px]">•</div>
+                    <div>HI</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex">
+            <!-- left panel -->
+            <div class="w-72 bg-zinc-900/70 border-r border-zinc-800 h-[calc(100vh-73px)] overflow-auto">
+                <div class="p-6">
+                    <div class="mb-8">
+                        <div class="uppercase text-[10px] tracking-[0.1em] font-mono text-amber-500 mb-1">CURRENT VIEW</div>
+                        <div class="display-font text-3xl font-bold text-white leading-none mb-1">Taj Mahal</div>
+                        <div class="text-zinc-500 text-sm">Agra, India • 1632-1653</div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <div class="text-xs uppercase font-medium text-zinc-500 mb-3 tracking-wider">QUICK FACTS</div>
+                            <div class="space-y-4">
+                                <div class="fact-bubble bg-zinc-900 rounded-xl p-3 group">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-amber-600 text-[13px]">📏</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-sm">73m tall</div>
+                                            <div class="text-zinc-500 text-xs">Central dome height</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fact-bubble bg-zinc-900 rounded-xl p-3 group">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-amber-600 text-[13px]">🧱</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-sm">20,000 workers</div>
+                                            <div class="text-zinc-500 text-xs">Built in 21 years</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fact-bubble bg-zinc-900 rounded-xl p-3 group">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-5 h-5 rounded bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-amber-600 text-[13px]">🌍</span>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-sm">UNESCO Site</div>
+                                            <div class="text-zinc-500 text-xs">Since 1983</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-xs uppercase font-medium text-zinc-500 mb-3 tracking-wider">SYMBOLISM</div>
+                            <div class="text-[13px] leading-snug text-zinc-400">
+                                Commissioned by Mughal emperor Shah Jahan in memory of his beloved wife Mumtaz Mahal. 
+                                Represents eternal love, perfect symmetry, and the pinnacle of Mughal architecture.
+                            </div>
+                            <div class="mt-4 flex gap-3">
+                                <div class="px-2.5 py-1 bg-zinc-800 rounded text-[11px] text-amber-400">ISLAMIC</div>
+                                <div class="px-2.5 py-1 bg-zinc-800 rounded text-[11px] text-amber-400">PERSIAN</div>
+                                <div class="px-2.5 py-1 bg-zinc-800 rounded text-[11px] text-amber-400">INDIAN</div>
+                            </div>
+                        </div>
+
+                        <div class="pt-3 border-t border-zinc-800">
+                            <div onclick="showHistory()" class="cursor-pointer flex items-center justify-between group">
+                                <div class="text-sm font-medium flex items-center gap-x-2">
+                                    <span class="text-amber-400">📜</span>
+                                    HISTORY TIMELINE
+                                </div>
+                                <div class="text-zinc-400 group-hover:-rotate-45 transition-transform">→</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- center model -->
+            <div class="flex-1 flex flex-col items-center pt-8 relative">
+                <div class="relative">
+                    <!-- sky elements -->
+                    <div class="moon"></div>
+
+                    <!-- the 3D scene -->
+                    <div class="scene w-[520px] h-[440px] flex items-center justify-center relative z-20" id="scene">
+                        <div class="taj-model" id="taj-model">
+                            <!-- water reflection -->
+                            <div class="water"></div>
+
+                            <!-- base platform -->
+                            <div class="taj-base"></div>
+
+                            <!-- trees -->
+                            <div class="tree left">
+                                <div class="tree-trunk"></div>
+                                <div class="tree-leaves"></div>
+                            </div>
+                            <div class="tree right">
+                                <div class="tree-trunk"></div>
+                                <div class="tree-leaves"></div>
+                            </div>
+
+                            <!-- minarets -->
+                            <div class="minaret" style="left: 42px; bottom: 26px; transform: rotateY(-18deg) rotateX(6deg);"></div>
+                            <div class="minaret" style="right: 42px; bottom: 26px; transform: rotateY(18deg) rotateX(6deg);"></div>
+                            <div class="minaret" style="left: 86px; bottom: 68px; height: 162px; transform: rotateY(-8deg);"></div>
+                            <div class="minaret" style="right: 86px; bottom: 68px; height: 162px; transform: rotateY(8deg);"></div>
+
+                            <!-- main building -->
+                            <div class="main-building">
+                                <div class="arch arch-left"></div>
+                                <div class="arch arch-center"></div>
+                                <div class="arch arch-right"></div>
+                                
+                                <!-- windows -->
+                                <div class="absolute top-6 left-8 w-4 h-6 bg-zinc-800 rounded" style="transform: skewX(-12deg);"></div>
+                                <div class="absolute top-6 right-8 w-4 h-6 bg-zinc-800 rounded" style="transform: skewX(12deg);"></div>
+                            </div>
+
+                            <!-- small domes -->
+                            <div class="small-dome left">
+                                <div class="pinnacle"></div>
+                            </div>
+                            <div class="small-dome right">
+                                <div class="pinnacle"></div>
+                            </div>
+
+                            <!-- main dome -->
+                            <div class="taj-dome" id="main-dome">
+                                <div class="pinnacle" style="top: -22px; height: 34px;"></div>
+                            </div>
+
+                            <!-- tourist dot -->
+                            <div class="tourist-dot" style="bottom: 102px; left: 50%; animation-delay: 0.4s;"></div>
+                            <div class="tourist-dot" style="bottom: 76px; left: 38%; animation-delay: 1.8s;"></div>
+                        </div>
+                    </div>
+
+                    <!-- model controls -->
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30">
+                        <div onclick="resetView()" 
+                             class="tour-btn bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-x-1.5 text-xs uppercase tracking-widest font-mono cursor-pointer transition-colors">
+                            <span>⟳</span>
+                            <span>RESET VIEW</span>
+                        </div>
+                        <div onclick="toggleInfoMode()" id="info-mode-btn"
+                             class="tour-btn bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl flex items-center gap-x-1.5 text-xs uppercase tracking-widest font-mono cursor-pointer transition-colors">
+                            <span>ℹ︎</span>
+                            <span>INFO MODE</span>
+                        </div>
+                    </div>
+
+                    <!-- floating infos -->
+                    <div class="info-float" id="dome-info" style="top: 82px; left: 218px;">
+                        The iconic central dome rises 73 meters. Its double shell design creates an incredible acoustic effect.
+                    </div>
+                    <div class="info-float" id="minaret-info" style="top: 142px; left: 48px;">
+                        Four 40m tall minarets lean outward at 1 degree to protect the main structure in case of collapse.
+                    </div>
+                    <div class="info-float" id="base-info" style="top: 248px; left: 142px;">
+                        Built on a raised platform to enhance the illusion of floating. Made from Makrana marble.
+                    </div>
+                </div>
+
+                <!-- labels -->
+                <div class="flex gap-8 mt-6 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+                    <div>MOUSE TO ORBIT</div>
+                    <div>SCROLL TO ZOOM</div>
+                    <div>DRAG TO SPIN</div>
+                </div>
+            </div>
+
+            <!-- right panel -->
+            <div class="w-80 bg-zinc-900/60 border-l border-zinc-800 h-[calc(100vh-73px)] p-6 overflow-auto">
+                <div class="mb-6">
+                    <div class="uppercase text-amber-500 text-[10px] tracking-[0.12em] font-mono mb-px">FOR STUDENTS</div>
+                    <div class="display-font text-xl font-semibold text-white">Educational Highlights</div>
+                </div>
+
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex items-center gap-x-2 mb-3">
+                            <div class="text-2xl">🏛️</div>
+                            <div>
+                                <div class="font-medium">ARCHITECTURE</div>
+                                <div class="text-xs text-zinc-500">Mughal • Persian • Indian fusion</div>
+                            </div>
+                        </div>
+                        <div class="pl-9 text-zinc-400 text-[13px] leading-snug">
+                            Perfect symmetry in plan and elevation. Use of white marble, 
+                            jali screens, and calligraphy of Quranic verses.
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center gap-x-2 mb-3">
+                            <div class="text-2xl">🌱</div>
+                            <div>
+                                <div class="font-medium">GARDENS</div>
+                                <div class="text-xs text-zinc-500">Charbagh style</div>
+                            </div>
+                        </div>
+                        <div class="pl-9 text-zinc-400 text-[13px] leading-snug">
+                            Formal Persian gardens with raised walkways, canals and fountains 
+                            representing paradise gardens from the Quran.
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center gap-x-2 mb-3">
+                            <div class="text-2xl">🕊️</div>
+                            <div>
+                                <div class="font-medium">LEGACY</div>
+                                <div class="text-xs text-zinc-500">Modern India icon</div>
+                            </div>
+                        </div>
+                        <div class="pl-9 text-zinc-400 text-[13px] leading-snug">
+                            Attracts over 8 million visitors yearly. A testament to love, 
+                            loss and the heights of human creativity.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- mini quiz -->
+                <div class="mt-10 bg-zinc-900 rounded-2xl p-5">
+                    <div class="uppercase font-mono text-amber-500 tracking-widest text-[10px] mb-3">QUICK QUIZ</div>
+                    
+                    <div class="text-sm font-medium mb-4">Who commissioned the Taj Mahal?</div>
+                    
+                    <div class="space-y-1.5 mb-6">
+                        <div class="bg-zinc-800 hover:bg-zinc-700/80 transition-colors px-4 py-[13px] rounded-xl cursor-pointer text-sm flex items-center gap-2" onclick="quizAnswer(1)">
+                            <div class="w-4 h-4 rounded border border-zinc-600 flex items-center justify-center">A</div>
+                            <div>Emperor Akbar</div>
+                        </div>
+                        <div class="bg-zinc-800 hover:bg-zinc-700/80 transition-colors px-4 py-[13px] rounded-xl cursor-pointer text-sm flex items-center gap-2" onclick="quizAnswer(2)">
+                            <div class="w-4 h-4 rounded border border-zinc-600 flex items-center justify-center">B</div>
+                            <div>Emperor Shah Jahan</div>
+                        </div>
+                        <div class="bg-zinc-800 hover:bg-zinc-700/80 transition-colors px-4 py-[13px] rounded-xl cursor-pointer text-sm flex items-center gap-2" onclick="quizAnswer(3)">
+                            <div class="w-4 h-4 rounded border border-zinc-600 flex items-center justify-center">C</div>
+                            <div>Emperor Aurangzeb</div>
+                        </div>
+                    </div>
+
+                    <div id="quiz-result" class="hidden text-xs"></div>
+                </div>
+
+                <div class="mt-8">
+                    <div class="text-zinc-500 text-xs mb-1.5">BROUGHT TO YOU BY</div>
+                    <div class="flex gap-6 opacity-60">
+                        <div class="text-[21px]">🇮🇳</div>
+                        <div>UNESCO</div>
+                        <div>Archaeological Survey of India</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- history modal -->
+    <div id="history-modal" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-50">
+        <div class="bg-zinc-900 max-w-md w-full mx-4 rounded-3xl overflow-hidden">
+            <div class="px-6 py-5 border-b border-zinc-800 flex items-center">
+                <div class="display-font text-lg font-medium">Construction Timeline</div>
+                <div onclick="hideHistory()" class="ml-auto text-zinc-400 hover:text-white cursor-pointer">✕</div>
+            </div>
+            
+            <div class="divide-y divide-zinc-800">
+                <div class="px-6 py-4 flex gap-6">
+                    <div class="w-12 font-mono text-right text-amber-400 text-xs leading-tight pt-1">
+                        1632
+                    </div>
+                    <div>
+                        <div class="font-medium text-sm mb-px">Work Begins</div>
+                        <div class="text-zinc-500 text-xs">After death of Mumtaz Mahal. First stones laid.</div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 flex gap-6">
+                    <div class="w-12 font-mono text-right text-amber-400 text-xs leading-tight pt-1">
+                        1638
+                    </div>
+                    <div>
+                        <div class="font-medium text-sm mb-px">Main Mausoleum</div>
+                        <div class="text-zinc-500 text-xs">Central dome structure completed.</div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 flex gap-6">
+                    <div class="w-12 font-mono text-right text-amber-400 text-xs leading-tight pt-1">
+                        1643
+                    </div>
+                    <div>
+                        <div class="font-medium text-sm mb-px">Minarets Rise</div>
+                        <div class="text-zinc-500 text-xs">Four towering minarets finished.</div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 flex gap-6">
+                    <div class="w-12 font-mono text-right text-amber-400 text-xs leading-tight pt-1">
+                        1653
+                    </div>
+                    <div>
+                        <div class="font-medium text-sm mb-px">Inauguration</div>
+                        <div class="text-zinc-500 text-xs">Completed after 21 years and 20,000 workers.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 bg-zinc-950 text-xs text-zinc-400">
+                The project employed artisans from across the Mughal empire and beyond, 
+                including Persia and Central Asia.
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed bottom-3 right-4 bg-zinc-900/80 px-2 py-1 rounded text-[10px] text-zinc-500 font-mono flex items-center gap-1.5">
+        MADE FOR LEARNING • DRAG MOUSE TO ROTATE
+    </div>
+
+    <script>
+        let isDragging = false
+        let previousX = 0
+        let previousY = 0
+        let rotX = 8
+        let rotY = -12
+        let zoom = 1
+
+        const model = document.getElementById('taj-model')
+        const scene = document.getElementById('scene')
+
+        function updateTransform() {
+            model.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) scale(${zoom})`
+        }
+
+        // mouse drag rotation
+        scene.addEventListener('mousedown', (e) => {
+            isDragging = true
+            previousX = e.clientX
+            previousY = e.clientY
+            scene.style.cursor = 'grabbing'
+        })
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return
+
+            const deltaX = e.clientX - previousX
+            const deltaY = e.clientY - previousY
+
+            rotY += deltaX * 0.42
+            rotX = Math.max(-22, Math.min(38, rotX - deltaY * 0.28))
+
+            previousX = e.clientX
+            previousY = e.clientY
+
+            updateTransform()
+        })
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false
+            scene.style.cursor = 'default'
+        })
+
+        // wheel zoom
+        scene.addEventListener('wheel', (e) => {
+            e.preventDefault()
+            
+            if (e.deltaY < 0) {
+                zoom = Math.min(1.38, zoom + 0.06)
+            } else {
+                zoom = Math.max(0.68, zoom - 0.06)
+            }
+            
+            updateTransform()
+        })
+
+        // reset view
+        window.resetView = function() {
+            rotX = 8
+            rotY = -12
+            zoom = 1
+            updateTransform()
+            
+            // brief animation
+            model.style.transition = 'transform 0.6s cubic-out'
+            setTimeout(() => {
+                model.style.transition = 'transform 0.15s ease-out'
+            }, 600)
+        }
+
+        // day mode toggle
+        let isDay = false
+        
+        window.toggleDayMode = function() {
+            isDay = !isDay
+            const toggle = document.getElementById('mode-toggle')
+            
+            if (isDay) {
+                document.body.classList.add('day-mode')
+                toggle.innerHTML = `
+                    <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+                    <span class="text-xs font-medium text-zinc-400">DAY MODE</span>
+                `
+            } else {
+                document.body.classList.remove('day-mode')
+                toggle.innerHTML = `
+                    <div class="w-2 h-2 bg-amber-400 rounded-full animate-pulse"></div>
+                    <span class="text-xs font-medium text-zinc-400">NIGHT MODE</span>
+                `
+            }
+        }
+
+        // info mode
+        let infoMode = false
+        const infoElements = [
+            document.getElementById('dome-info'),
+            document.getElementById('minaret-info'),
+            document.getElementById('base-info')
+        ]
+
+        window.toggleInfoMode = function() {
+            infoMode = !infoMode
+            
+            const btn = document.getElementById('info-mode-btn')
+            
+            if (infoMode) {
+                btn.classList.add('bg-amber-400', 'text-zinc-950')
+                btn.classList.remove('bg-white/5', 'text-zinc-200')
+                btn.innerHTML = `<span>✕</span><span>HIDE LABELS</span>`
+                
+                // highlight some elements
+                document.getElementById('main-dome').classList.add('highlight')
+                
+                // show all infos with delay
+                setTimeout(() => infoElements[0].classList.add('show'), 120)
+                setTimeout(() => infoElements[1].classList.add('show'), 340)
+                setTimeout(() => infoElements[2].classList.add('show'), 520)
+            } else {
+                btn.classList.remove('bg-amber-400', 'text-zinc-950')
+                btn.classList.add('bg-white/5', 'text-zinc-200')
+                btn.innerHTML = `<span>ℹ︎</span><span>INFO MODE</span>`
+                
+                document.getElementById('main-dome').classList.remove('highlight')
+                
+                infoElements.forEach(el => el.classList.remove('show'))
+            }
+        }
+
+        // hover highlights
+        const dome = document.getElementById('main-dome')
+        const minarets = document.querySelectorAll('.minaret')
+        const base = document.querySelector('.taj-base')
+
+        dome.addEventListener('mouseenter', () => {
+            if (!infoMode) return
+            document.getElementById('dome-info').classList.add('show')
+            dome.style.filter = 'brightness(1.2)'
+        })
+
+        dome.addEventListener('mouseleave', () => {
+            if (!infoMode) return
+            document.getElementById('dome-info').classList.remove('show')
+            dome.style.filter = 'none'
+        })
+
+        minarets.forEach(m => {
+            m.addEventListener('mouseenter', () => {
+                if (!infoMode) return
+                document.getElementById('minaret-info').classList.add('show')
+            })
+            
+            m.addEventListener('mouseleave', () => {
+                if (!infoMode) return
+                document.getElementById('minaret-info').classList.remove('show')
+            })
+        })
+
+        base.addEventListener('mouseenter', () => {
+            if (!infoMode) return
+            document.getElementById('base-info').classList.add('show')
+        })
+
+        base.addEventListener('mouseleave', () => {
+            if (!infoMode) return
+            document.getElementById('base-info').classList.remove('show')
+        })
+
+        // history modal
+        window.showHistory = function() {
+            document.getElementById('history-modal').classList.remove('hidden')
+            document.getElementById('history-modal').classList.add('flex')
+        }
+
+        window.hideHistory = function() {
+            document.getElementById('history-modal').classList.add('hidden')
+            document.getElementById('history-modal').classList.remove('flex')
+        }
+
+        // quiz
+        window.quizAnswer = function(choice) {
+            const resultEl = document.getElementById('quiz-result')
+            
+            resultEl.classList.remove('hidden')
+            
+            if (choice === 2) {
+                resultEl.innerHTML = `
+                    <div class="flex items-center gap-x-2 text-emerald-400">
+                        <div>✓</div>
+                        <div>EXACTLY RIGHT! Shah Jahan built it for Mumtaz Mahal.</div>
+                    </div>
+                `
+                resultEl.className = 'text-xs bg-emerald-950 border border-emerald-900 px-3 py-2 rounded-xl'
+            } else {
+                resultEl.innerHTML = `
+                    <div class="flex items-center gap-x-2 text-rose-400">
+                        <div>✗</div>
+                        <div>Actually it was Emperor Shah Jahan.</div>
+                    </div>
+                    <div class="mt-2.5 text-zinc-500">Try again!</div>
+                `
+                resultEl.className = 'text-xs bg-rose-950 border border-rose-900 px-3 py-2 rounded-xl'
+            }
+            
+            // auto hide after 4s
+            setTimeout(() => {
+                resultEl.classList.add('hidden')
+            }, 4200)
+        }
+
+        // keyboard shortcuts
+        document.addEventListener('keydown', e => {
+            if (e.key === 'r' || e.key === 'R') {
+                resetView()
+            }
+            
+            if (e.key === 'i' || e.key === 'I') {
+                toggleInfoMode()
+            }
+            
+            if (e.key === 'd' || e.key === 'D') {
+                toggleDayMode()
+            }
+        })
+
+        // initial transform
+        setTimeout(() => {
+            updateTransform()
+            
+            // gentle intro animation
+            setTimeout(() => {
+                rotY = -4
+                updateTransform()
+            }, 420)
+            
+            setTimeout(() => {
+                rotY = -12
+                updateTransform()
+            }, 820)
+        }, 180)
+    </script>
+</body>
+</html>
+```

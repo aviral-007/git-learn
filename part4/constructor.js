@@ -1,0 +1,52 @@
+function Person(name,age){
+    this.name=name
+    this.age=age
+}
+function Car(make,model){
+    this.make=make
+    this.model=model
+}
+
+let myCar = new Car("toyota","camry"); // new and this has internal linking 
+console.log(myCar);
+
+let myNewCar = new Car("tata","safari")
+console.log(myNewCar);
+
+
+function Tea(type){
+    this.type=type
+    this.describe=function(){
+        return `this is a cup of ${this.type}`
+    }
+}
+
+let lemonTea = new Tea("lemon tea")
+console.log(lemonTea.describe());
+
+function Animal(species){
+    this.species=species
+
+}
+
+Animal.prototype.sound = function(){
+    return ` ${this.species} makes a sound `
+}    
+
+let dog= new Animal("dog")
+console.log(dog.sound());
+let cat= new Animal("cat")
+console.log(cat.sound());
+
+function Drink(namee){
+    if(!new.target){
+        throw new Error("drink must be called with new keyword")
+    }
+    this.namee=namee
+
+}
+
+let juice = new Drink("chai")
+console.log(juice);
+let coffee= Drink("coffee")
+
